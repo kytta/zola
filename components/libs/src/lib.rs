@@ -17,6 +17,7 @@ pub use globset;
 pub use grass;
 pub use image;
 pub use lexical_sort;
+pub use lightningcss;
 pub use minify_html;
 pub use nom_bibtex;
 pub use num_format;
