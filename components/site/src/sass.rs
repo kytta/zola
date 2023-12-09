@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 
 use libs::globset::Glob;
 use libs::grass::{from_path as compile_file, Options, OutputStyle};
+use libs::lightningcss::stylesheet::{MinifyOptions, ParserOptions, PrinterOptions, StyleSheet};
 use libs::walkdir::{DirEntry, WalkDir};
 
 use crate::anyhow;
@@ -25,6 +26,11 @@ pub fn compile_sass(base_path: &Path, output_path: &Path) -> Result<()> {
     for file in files {
         let css = compile_file(&file, &options).map_err(|e| anyhow!(e))?;
 
+        let mut stylesheet =
+            StyleSheet::parse(&css, ParserOptions::default()).map_err(|e| anyhow!("{e}"))?;
+        stylesheet.minify(MinifyOptions::default()).map_err(|e| anyhow!(e))?;
+        let code = stylesheet.to_css(PrinterOptions::default()).map_err(|e| anyhow!(e))?.code;
+
         let path_inside_sass = file.strip_prefix(&sass_path).unwrap();
         let parent_inside_sass = path_inside_sass.parent();
         let css_output_path = output_path.join(path_inside_sass).with_extension("css");
@@ -33,7 +39,7 @@ pub fn compile_sass(base_path: &Path, output_path: &Path) -> Result<()> {
             create_dir_all(css_output_path.parent().unwrap())?;
         }
 
-        create_file(&css_output_path, &css)?;
+        create_file(&css_output_path, &code)?;
         compiled_paths.push((path_inside_sass.to_owned(), css_output_path));
     }
 
