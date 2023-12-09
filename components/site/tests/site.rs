@@ -183,7 +183,7 @@ fn can_build_site_without_live_reload() {
     // SASS and SCSS files compile correctly
     assert!(file_exists!(public, "blog.css"));
     assert!(file_contains!(public, "blog.css", "red"));
-    assert!(file_contains!(public, "blog.css", "blue"));
+    assert!(file_contains!(public, "blog.css", "#00f")); // Lightning CSS converts it to a hex code
     assert!(!file_contains!(public, "blog.css", "@import \"included\""));
     assert!(file_contains!(public, "blog.css", "2rem")); // check include
     assert!(!file_exists!(public, "_included.css"));
